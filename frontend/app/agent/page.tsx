@@ -8,10 +8,23 @@ import { Input, Textarea } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { apiGet, apiPut } from "@/lib/api";
 
-const MODELS = [
-  { id: "claude-sonnet-4-6", label: "Sonnet 4.6" },
-  { id: "claude-opus-4-8", label: "Opus 4.8" },
-  { id: "claude-fable-5", label: "Fable 5" },
+const MODEL_GROUPS = [
+  {
+    provider: "Anthropic (Claude)",
+    models: [
+      { id: "claude-sonnet-4-6", label: "Sonnet 4.6" },
+      { id: "claude-opus-4-8", label: "Opus 4.8" },
+      { id: "claude-fable-5", label: "Fable 5" },
+    ],
+  },
+  {
+    provider: "OpenAI (GPT)",
+    models: [
+      { id: "gpt-4o", label: "GPT-4o" },
+      { id: "gpt-4o-mini", label: "GPT-4o mini" },
+      { id: "gpt-4.1", label: "GPT-4.1" },
+    ],
+  },
 ];
 
 export default function AgentPage() {
@@ -114,19 +127,28 @@ export default function AgentPage() {
             <CardTitle>Model</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex flex-wrap gap-2">
-              {MODELS.map((m) => (
-                <button
-                  key={m.id}
-                  onClick={() => set("model_preference", m.id)}
-                  className={`rounded-md border px-3 py-2 text-sm ${
-                    profile.model_preference === m.id
-                      ? "border-primary bg-primary/10 text-primary"
-                      : "hover:bg-accent"
-                  }`}
-                >
-                  {m.label}
-                </button>
+            <div className="space-y-3">
+              {MODEL_GROUPS.map((group) => (
+                <div key={group.provider}>
+                  <p className="mb-1 text-xs font-medium text-muted-foreground">
+                    {group.provider}
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {group.models.map((m) => (
+                      <button
+                        key={m.id}
+                        onClick={() => set("model_preference", m.id)}
+                        className={`rounded-md border px-3 py-2 text-sm ${
+                          profile.model_preference === m.id
+                            ? "border-primary bg-primary/10 text-primary"
+                            : "hover:bg-accent"
+                        }`}
+                      >
+                        {m.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               ))}
             </div>
             <Field label="Custom system prompt (advanced)" className="mt-4">

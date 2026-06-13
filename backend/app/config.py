@@ -26,6 +26,9 @@ class Settings(BaseSettings):
     anthropic_api_key: str = ""
     default_model: str = "claude-sonnet-4-6"
 
+    # OpenAI chat (agent brain, when an OpenAI model is selected)
+    openai_chat_model: str = "gpt-4o"
+
     # Embeddings
     embedding_provider: str = "openai"
     embedding_model: str = "text-embedding-3-small"

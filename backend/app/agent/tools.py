@@ -165,6 +165,7 @@ TOOL_CONNECTOR = {
 
 
 def build_tools(connectors: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Anthropic tool-use format (name / description / input_schema)."""
     connected = {c["type"] for c in connectors if c.get("status") == "connected"}
     # google_sheets tools work off the google_drive (Google) connection too.
     if "google_drive" in connected:
@@ -176,6 +177,21 @@ def build_tools(connectors: list[dict[str, Any]]) -> list[dict[str, Any]]:
         if TOOL_CONNECTOR.get(name) in connected:
             tools.append(schema)
     return tools
+
+
+def build_openai_tools(connectors: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Same tool set, converted to OpenAI function-calling format."""
+    return [
+        {
+            "type": "function",
+            "function": {
+                "name": t["name"],
+                "description": t["description"],
+                "parameters": t["input_schema"],
+            },
+        }
+        for t in build_tools(connectors)
+    ]
 
 
 async def execute_tool(
