@@ -12,6 +12,7 @@ token usage.
 from __future__ import annotations
 
 import json
+import unicodedata
 from typing import Any, AsyncGenerator
 
 from anthropic import AsyncAnthropic
@@ -32,10 +33,50 @@ ANTHROPIC_MODELS = {"claude-sonnet-4-6", "claude-opus-4-8", "claude-fable-5"}
 OPENAI_MODELS = {"gpt-4o", "gpt-4o-mini", "gpt-4.1"}
 VALID_MODELS = ANTHROPIC_MODELS | OPENAI_MODELS
 
+# Automatic model routing (100% OpenAI). Simple/short requests go to the cheap
+# model; complex ones (long, code, reasoning, multi-document RAG) are escalated.
+AUTO_SIMPLE_MODEL = "gpt-4o-mini"
+AUTO_COMPLEX_MODEL = "gpt-4o"
 
-def _resolve_model(profile: dict[str, Any] | None) -> str:
-    pref = (profile or {}).get("model_preference") or settings.default_model
-    return pref if pref in VALID_MODELS else settings.default_model
+_COMPLEX_KEYWORDS = (
+    "analyse", "analyser", "compare", "comparer", "strateg", "strateg",
+    "explique", "expliquer", "pourquoi", "redige", "rediger",
+    "code", "coder", "debug", "debog", "corrige", "function",
+    "fonction", "script", "calcule", "calculer", "resous", "resoudre",
+    "resoudre", "plan", "traduis", "traduire", "rapport",
+    "resume", "synthese", "ecris", "rediges",
+    "write", "draft", "summarize", "translate", "reasoning", "step by step",
+    "etape par etape", "algorithm", "algorithme",
+)
+
+
+def _auto_select_model(message: str, match_count: int = 0) -> str:
+    """Heuristic, per-message model selection - no extra API call, no latency.
+
+    Returns AUTO_COMPLEX_MODEL for requests that look demanding, otherwise the
+    cheaper AUTO_SIMPLE_MODEL. Tuned to keep ~90% of casual chat on the cheap
+    model while escalating anything that benefits from a stronger model.
+    """
+    text = (message or "").strip()
+    # Lowercase and strip accents so ASCII keywords match accented French input.
+    lowered = "".join(
+        c for c in unicodedata.normalize("NFD", text.lower())
+        if unicodedata.category(c) != "Mn"
+    )
+    if "```" in text or len(text) > 320 or len(text.split()) > 60:
+        return AUTO_COMPLEX_MODEL
+    if match_count >= 3:
+        return AUTO_COMPLEX_MODEL
+    if text.count("?") >= 3:
+        return AUTO_COMPLEX_MODEL
+    if any(kw in lowered for kw in _COMPLEX_KEYWORDS):
+        return AUTO_COMPLEX_MODEL
+    return AUTO_SIMPLE_MODEL
+
+
+def _resolve_model(message: str, match_count: int = 0) -> str:
+    """Always auto-route. The manual model picker has been removed from the UI."""
+    return _auto_select_model(message, match_count)
 
 
 def _provider_for(model: str) -> str:
@@ -61,8 +102,6 @@ async def run_agent(
 
     profile = queries.get_profile(user_id)
     connectors = queries.list_connectors(user_id)
-    model = _resolve_model(profile)
-    provider = _provider_for(model)
 
     # Persist the incoming user message.
     queries.add_message(
@@ -77,6 +116,10 @@ async def run_agent(
     # RAG retrieval for the system prompt (step 4).
     matches = await rag.retrieve(user_id, message)
     rag_context = rag.format_context(matches)
+
+    # Automatic per-message model selection (depends on RAG match count).
+    model = _resolve_model(message, len(matches))
+    provider = _provider_for(model)
     system_prompt = build_system_prompt(profile, connectors, rag_context, user.timezone)
 
     # Conversation history (last ~10) as a shared message list.
