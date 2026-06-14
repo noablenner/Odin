@@ -24,7 +24,7 @@ class Settings(BaseSettings):
 
     # Anthropic
     anthropic_api_key: str = ""
-    default_model: str = "claude-sonnet-4-6"
+    default_model: str = "gpt-4o-mini"
 
     # OpenAI chat (agent brain, when an OpenAI model is selected)
     openai_chat_model: str = "gpt-4o"
