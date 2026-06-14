@@ -28,7 +28,7 @@ class CompanyProfile(BaseModel):
     custom_system_prompt: Optional[str] = None
     agent_name: Optional[str] = "Odin"
     agent_personality: Optional[str] = None
-    model_preference: Optional[str] = "claude-sonnet-4-6"
+    model_preference: Optional[str] = "auto"
     response_language: Optional[str] = "auto"
 
 
