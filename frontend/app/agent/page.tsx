@@ -8,25 +8,6 @@ import { Input, Textarea } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { apiGet, apiPut } from "@/lib/api";
 
-const MODEL_GROUPS = [
-  {
-    provider: "Anthropic (Claude)",
-    models: [
-      { id: "claude-sonnet-4-6", label: "Sonnet 4.6" },
-      { id: "claude-opus-4-8", label: "Opus 4.8" },
-      { id: "claude-fable-5", label: "Fable 5" },
-    ],
-  },
-  {
-    provider: "OpenAI (GPT)",
-    models: [
-      { id: "gpt-4o", label: "GPT-4o" },
-      { id: "gpt-4o-mini", label: "GPT-4o mini" },
-      { id: "gpt-4.1", label: "GPT-4.1" },
-    ],
-  },
-];
-
 export default function AgentPage() {
   const [profile, setProfile] = useState<any>(null);
   const [channels, setChannels] = useState<any[]>([]);
@@ -124,32 +105,17 @@ export default function AgentPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Model</CardTitle>
+            <CardTitle>Modèle</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-3">
-              {MODEL_GROUPS.map((group) => (
-                <div key={group.provider}>
-                  <p className="mb-1 text-xs font-medium text-muted-foreground">
-                    {group.provider}
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    {group.models.map((m) => (
-                      <button
-                        key={m.id}
-                        onClick={() => set("model_preference", m.id)}
-                        className={`rounded-md border px-3 py-2 text-sm ${
-                          profile.model_preference === m.id
-                            ? "border-primary bg-primary/10 text-primary"
-                            : "hover:bg-accent"
-                        }`}
-                      >
-                        {m.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              ))}
+            <div className="flex items-start gap-3 rounded-md border bg-accent/40 p-3">
+              <Badge variant="success">Automatique</Badge>
+              <p className="text-sm text-muted-foreground">
+                Le modèle est choisi automatiquement selon la complexité de votre
+                demande : les questions simples utilisent un modèle rapide et
+                économique, les tâches complexes un modèle plus puissant. Aucun
+                réglage nécessaire.
+              </p>
             </div>
             <Field label="Custom system prompt (advanced)" className="mt-4">
               <Textarea value={profile.custom_system_prompt || ""} onChange={(e) => set("custom_system_prompt", e.target.value)} placeholder="Overrides the default base prompt when set." />
