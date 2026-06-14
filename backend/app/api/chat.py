@@ -1,5 +1,4 @@
 """Chat API — SSE streaming + conversation history."""
-from __future__ import annotations
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import StreamingResponse
