@@ -3,6 +3,9 @@ import { Reveal } from "@/components/motion/Reveal";
 import { trust } from "@/lib/content";
 
 export function TrustBar() {
+  // Duplicate the logo list so the marquee loops seamlessly.
+  const row = [...trust.logos, ...trust.logos];
+
   return (
     <section className="border-y border-border bg-background-2/30 py-10">
       <Container>
@@ -11,18 +14,20 @@ export function TrustBar() {
             {trust.label}
           </p>
         </Reveal>
-        <div className="mt-7 flex flex-wrap items-center justify-center gap-x-10 gap-y-5 opacity-70">
-          {trust.logos.map((logo) => (
+      </Container>
+      <div className="marquee-mask mt-7 overflow-hidden">
+        <div className="marquee-track gap-12 px-6">
+          {row.map((logo, i) => (
             <span
-              key={logo}
-              className="font-display text-lg font-semibold tracking-tight text-muted-foreground"
+              key={`${logo}-${i}`}
+              className="shrink-0 font-display text-lg font-semibold tracking-tight text-muted-foreground/70 transition-colors hover:text-foreground"
             >
               {/* TODO: replace text with real client/press SVG logos */}
               {logo}
             </span>
           ))}
         </div>
-      </Container>
+      </div>
     </section>
   );
 }

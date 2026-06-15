@@ -25,7 +25,11 @@ export function Hero() {
       <div className="pointer-events-none absolute inset-0 bg-grid bg-grid [mask-image:radial-gradient(60%_50%_at_50%_0%,black,transparent)] opacity-40" />
       <div
         aria-hidden
-        className="pointer-events-none absolute left-1/2 top-[-10%] h-[420px] w-[820px] -translate-x-1/2 rounded-full bg-primary/20 blur-[120px]"
+        className="pointer-events-none absolute left-1/2 top-[-10%] h-[420px] w-[820px] -translate-x-1/2 rounded-full bg-primary/20 blur-[120px] animate-float"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute right-[8%] top-[30%] h-64 w-64 rounded-full bg-accent/20 blur-[100px] animate-pulse"
       />
 
       <Container className="relative pb-20 pt-16 sm:pt-24">
@@ -50,7 +54,7 @@ export function Hero() {
               <LogoMark className="mb-1 mr-1 inline-block h-10 w-10 align-middle sm:h-14 sm:w-14 animate-float" />
             </span>
             <br className="hidden sm:block" />
-            <span className="text-gradient">{hero.title[1]}</span>
+            <span className="text-gradient text-gradient-animate">{hero.title[1]}</span>
           </motion.h1>
 
           <motion.p

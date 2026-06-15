@@ -1,5 +1,6 @@
 import { cn } from "@/lib/utils";
 import { Container } from "./Container";
+import { Reveal } from "@/components/motion/Reveal";
 
 export function Section({
   id,
@@ -33,7 +34,7 @@ export function SectionHeading({
   className?: string;
 }) {
   return (
-    <div
+    <Reveal
       className={cn(
         "max-w-2xl",
         align === "center" ? "mx-auto text-center" : "text-left",
@@ -53,6 +54,6 @@ export function SectionHeading({
           {description}
         </p>
       )}
-    </div>
+    </Reveal>
   );
 }
