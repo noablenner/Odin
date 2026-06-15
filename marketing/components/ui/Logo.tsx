@@ -1,48 +1,35 @@
+import Image from "next/image";
 import { cn } from "@/lib/utils";
+import markLight from "../brand/logo-mark-light.png";
+import markDark from "../brand/logo-mark-dark.png";
 
 /**
- * Odin brandmark — an SVG approximation of the supplied logo: a tilted
- * violet→magenta halo, a 4-point sparkle, and a navy head silhouette.
- *
- * TODO: drop the final raster/vector assets into /public
- *   (logo-odin.png — horizontal lockup, logo-odin-mark.png — icon) and swap
- *   <LogoMark/> for <Image/> if you prefer the exact artwork.
+ * Odin brandmark — the official artwork.
+ * Two theme variants are rendered and toggled with the `dark` class:
+ *   • navy mark on transparent  → light theme
+ *   • light mark on transparent → dark theme
+ * Sizing comes from `className` (e.g. "h-8 w-8") on the wrapper.
  */
 export function LogoMark({ className }: { className?: string }) {
   return (
-    <svg viewBox="0 0 48 48" className={className} aria-hidden="true">
-      <defs>
-        <linearGradient id="odin-halo" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor="hsl(262 83% 62%)" />
-          <stop offset="100%" stopColor="hsl(291 86% 58%)" />
-        </linearGradient>
-      </defs>
-      {/* halo */}
-      <g transform="rotate(-18 24 15)">
-        <ellipse
-          cx="24"
-          cy="15"
-          rx="17"
-          ry="5.5"
-          fill="none"
-          stroke="url(#odin-halo)"
-          strokeWidth="2.6"
-          strokeLinecap="round"
-          strokeDasharray="74 26"
-        />
-      </g>
-      {/* head / beard silhouette (navy) */}
-      <path
-        d="M19 16c-4 2-6 6-5 11 .6 3 .3 6-1 9 3 .4 5-1 6.5-3 1.6 2 4 3 6.5 2.4-1.2-1.6-1.4-3.4-.8-5.4 1.8-1 3-2.9 3-5.2 0-4.8-4.2-8.2-9.7-8.8-1.6-.2-3.2.2-4.5.9Z"
-        fill="hsl(218 48% 17%)"
-        className="dark:fill-[hsl(220_30%_92%)]"
+    <span className={cn("relative inline-block", className)}>
+      <Image
+        src={markLight}
+        alt="Odin"
+        fill
+        sizes="64px"
+        priority
+        className="object-contain dark:hidden"
       />
-      {/* sparkle */}
-      <path
-        d="M39 9.5l1.1 2.6 2.6 1.1-2.6 1.1-1.1 2.6-1.1-2.6-2.6-1.1 2.6-1.1z"
-        fill="hsl(291 86% 60%)"
+      <Image
+        src={markDark}
+        alt=""
+        aria-hidden
+        fill
+        sizes="64px"
+        className="hidden object-contain dark:block"
       />
-    </svg>
+    </span>
   );
 }
 
