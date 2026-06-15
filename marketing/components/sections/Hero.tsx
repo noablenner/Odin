@@ -1,10 +1,12 @@
 "use client";
 
 import { motion, useReducedMotion } from "framer-motion";
-import { ArrowRight, ChevronDown, Sparkles, Star, Wand2 } from "lucide-react";
+import { ArrowRight, Sparkles, Star } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { ButtonLink } from "@/components/ui/Button";
 import { LogoMark } from "@/components/ui/Logo";
+import { Aurora } from "@/components/motion/Aurora";
+import { HeroDemo } from "./HeroDemo";
 import { hero } from "@/lib/content";
 import { links } from "@/lib/config";
 
@@ -20,17 +22,8 @@ export function Hero() {
 
   return (
     <section className="relative overflow-hidden">
-      {/* background glow + grid */}
-      <div className="pointer-events-none absolute inset-0 bg-radial-glow" />
-      <div className="pointer-events-none absolute inset-0 bg-grid bg-grid [mask-image:radial-gradient(60%_50%_at_50%_0%,black,transparent)] opacity-40" />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute left-1/2 top-[-10%] h-[420px] w-[820px] -translate-x-1/2 rounded-full bg-primary/20 blur-[120px] animate-float"
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute right-[8%] top-[30%] h-64 w-64 rounded-full bg-accent/20 blur-[100px] animate-pulse"
-      />
+      <Aurora />
+      <div className="pointer-events-none absolute inset-0 bg-grid [mask-image:radial-gradient(65%_55%_at_50%_0%,black,transparent)] opacity-30" />
 
       <Container className="relative pb-20 pt-16 sm:pt-24">
         <div className="mx-auto max-w-3xl text-center">
@@ -50,9 +43,7 @@ export function Hero() {
             className="font-display text-4xl font-bold leading-[1.05] tracking-tight sm:text-6xl md:text-7xl"
           >
             {hero.title[0]}{" "}
-            <span className="relative inline-flex items-center">
-              <LogoMark className="mb-1 mr-1 inline-block h-10 w-10 align-middle sm:h-14 sm:w-14 animate-float" />
-            </span>
+            <LogoMark className="mb-1 mr-1 inline-block h-10 w-10 align-middle animate-float sm:h-14 sm:w-14" />
             <br className="hidden sm:block" />
             <span className="text-gradient text-gradient-animate">{hero.title[1]}</span>
           </motion.h1>
@@ -64,39 +55,30 @@ export function Hero() {
             {hero.subtitle}
           </motion.p>
 
-          {/* Prompt mock card */}
-          <motion.div {...fade(0.24)} className="mx-auto mt-10 max-w-2xl">
-            <div className="glass rounded-xl p-3 shadow-glow-sm">
-              <div className="flex items-center gap-2 px-2 py-3 text-left text-sm text-muted-foreground sm:text-base">
-                <Wand2 className="h-5 w-5 shrink-0 text-primary" />
-                <span className="text-foreground/90">{hero.examplePrompt}</span>
-              </div>
-              <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-                <span className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface-2/60 px-3 py-2 text-sm">
-                  <LogoMark className="h-5 w-5" />
-                  Agent Odin
-                  <ChevronDown className="h-4 w-4 text-muted-foreground" />
-                </span>
-                <div className="flex flex-1 gap-2">
-                  <ButtonLink href={links.signup} size="md" className="flex-1">
-                    {hero.ctaPrimary} <ArrowRight className="h-4 w-4" />
-                  </ButtonLink>
-                  <ButtonLink href={links.demo} variant="outline" size="md">
-                    {hero.ctaSecondary}
-                  </ButtonLink>
-                </div>
-              </div>
-            </div>
+          <motion.div
+            {...fade(0.24)}
+            className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row"
+          >
+            <ButtonLink href={links.signup} size="lg">
+              {hero.ctaPrimary} <ArrowRight className="h-4 w-4" />
+            </ButtonLink>
+            <ButtonLink href={links.demo} variant="outline" size="lg">
+              {hero.ctaSecondary}
+            </ButtonLink>
           </motion.div>
 
           <motion.p
             {...fade(0.32)}
-            className="mt-5 inline-flex items-center gap-1.5 text-sm text-muted-foreground"
+            className="mt-4 inline-flex items-center gap-1.5 text-sm text-muted-foreground"
           >
             <Sparkles className="h-4 w-4 text-primary" />
             Sans carte bancaire · Mise en route en quelques minutes
           </motion.p>
         </div>
+
+        <motion.div {...fade(0.4)}>
+          <HeroDemo />
+        </motion.div>
       </Container>
     </section>
   );
