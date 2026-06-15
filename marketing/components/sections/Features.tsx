@@ -1,5 +1,6 @@
 import { Section, SectionHeading } from "@/components/ui/Section";
 import { Stagger, StaggerItem } from "@/components/motion/Reveal";
+import { SpotlightCard } from "@/components/motion/Spotlight";
 import { features } from "@/lib/content";
 
 export function Features() {
@@ -15,15 +16,15 @@ export function Features() {
           const Icon = f.icon;
           return (
             <StaggerItem key={f.title}>
-              <div className="group h-full rounded-xl border border-border bg-card/70 p-6 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-glow-sm">
-                <div className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-lg bg-brand-gradient text-white shadow-glow-sm">
+              <SpotlightCard>
+                <div className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-lg bg-brand-gradient text-white shadow-glow-sm transition-transform duration-300 group-hover:scale-110">
                   <Icon className="h-5 w-5" />
                 </div>
                 <h3 className="font-display text-lg font-semibold">{f.title}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
                   {f.description}
                 </p>
-              </div>
+              </SpotlightCard>
             </StaggerItem>
           );
         })}
