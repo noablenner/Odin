@@ -1,0 +1,124 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * Design tokens — derived from the NodeFlow brand.
+ * Dark is the primary experience (both reference sites are dark); light is a
+ * cohesive companion using the Odin navy as foreground.
+ * HSL channels so Tailwind can apply opacity modifiers.
+ */
+@layer base {
+  :root,
+  .dark {
+    --background: 263 45% 5%;        /* #0A0712 deep violet-black */
+    --background-2: 270 50% 3%;      /* near-black for gradient end */
+    --surface: 264 38% 9%;           /* #120D1F */
+    --surface-2: 263 34% 14%;        /* #1A1430 */
+    --card: 264 36% 10%;
+    --foreground: 0 0% 100%;
+    --muted: 263 24% 18%;
+    --muted-foreground: 265 18% 72%; /* #A89FC0 purple-gray */
+    --border: 264 40% 80% / 0.12;
+
+    --primary: 258 90% 66%;          /* #8B5CF6 violet */
+    --primary-foreground: 0 0% 100%;
+    --accent: 291 86% 55%;           /* #D426EE magenta */
+    --accent-foreground: 0 0% 100%;
+    --navy: 218 48% 17%;             /* #16233E Odin logo navy */
+    --ring: 258 90% 66%;
+
+    /* brand gradient stops (violet → purple → magenta) */
+    --grad-from: 262 83% 58%;        /* #7C3AED */
+    --grad-via: 271 81% 66%;         /* #A855F7 */
+    --grad-to: 291 86% 55%;          /* #D426EE */
+
+    --radius: 1rem;
+  }
+
+  .light {
+    --background: 0 0% 100%;
+    --background-2: 260 30% 98%;
+    --surface: 260 33% 97%;
+    --surface-2: 260 30% 94%;
+    --card: 0 0% 100%;
+    --foreground: 218 48% 17%;       /* Odin navy */
+    --muted: 260 24% 92%;
+    --muted-foreground: 258 12% 42%;
+    --border: 218 30% 20% / 0.1;
+
+    --primary: 262 83% 58%;
+    --primary-foreground: 0 0% 100%;
+    --accent: 291 80% 50%;
+    --accent-foreground: 0 0% 100%;
+    --navy: 218 48% 17%;
+    --ring: 262 83% 58%;
+
+    --grad-from: 262 83% 55%;
+    --grad-via: 271 76% 58%;
+    --grad-to: 291 80% 50%;
+
+    --radius: 1rem;
+  }
+
+  * {
+    border-color: hsl(var(--border));
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-family: var(--font-sans), system-ui, sans-serif;
+  }
+
+  ::selection {
+    background: hsl(var(--primary) / 0.35);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  .text-gradient {
+    background-image: linear-gradient(
+      110deg,
+      hsl(var(--grad-from)),
+      hsl(var(--grad-via)) 50%,
+      hsl(var(--grad-to))
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .glass {
+    background: hsl(var(--surface) / 0.6);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid hsl(var(--border));
+  }
+
+  /* Thin subtle scrollbar */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--primary) / 0.3);
+    border-radius: 999px;
+  }
+}
