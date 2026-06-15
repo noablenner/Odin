@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from typing import Any, Optional
+from urllib.parse import quote
 
 import httpx
 
@@ -83,7 +84,7 @@ async def get_records(
     params: dict[str, Any] = {"maxRecords": max_records}
     if filter_formula:
         params["filterByFormula"] = filter_formula
-    data = await _get(creds, f"{API_BASE}/{base_id}/{table}", params=params)
+    data = await _get(creds, f"{API_BASE}/{base_id}/{quote(table)}", params=params)
     return data.get("records", [])
 
 
@@ -92,7 +93,7 @@ async def create_record(
 ) -> dict[str, Any]:
     async with httpx.AsyncClient(timeout=30) as client:
         resp = await client.post(
-            f"{API_BASE}/{base_id}/{table}",
+            f"{API_BASE}/{base_id}/{quote(table)}",
             headers={
                 "Authorization": f"Bearer {_token(creds)}",
                 "Content-Type": "application/json",
