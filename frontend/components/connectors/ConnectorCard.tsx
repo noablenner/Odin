@@ -17,6 +17,7 @@ export interface ConnectorDef {
   method: "oauth" | "apikey" | "rest" | "webhook";
   oauthProvider?: string;
   keyPlaceholder?: string;
+  comingSoon?: boolean;
 }
 
 export function ConnectorCard({
@@ -78,11 +79,15 @@ export function ConnectorCard({
             <CardTitle className="text-base">{def.name}</CardTitle>
             <p className="mt-1 text-xs text-muted-foreground">{def.description}</p>
           </div>
-          <Badge variant={variant}>{status}</Badge>
+          <Badge variant={def.comingSoon ? "muted" : variant}>{def.comingSoon ? "soon" : status}</Badge>
         </div>
       </CardHeader>
       <CardContent className="space-y-3">
-        {connected ? (
+        {def.comingSoon ? (
+          <Button size="sm" variant="outline" className="w-full" disabled>
+            Bientôt disponible
+          </Button>
+        ) : connected ? (
           <>
             <p className="text-xs text-muted-foreground">
               Last sync: {relativeTime(state.last_sync_at)}
