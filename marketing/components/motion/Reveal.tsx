@@ -9,7 +9,7 @@ const ease = [0.22, 1, 0.36, 1] as const;
 export function Reveal({
   children,
   delay = 0,
-  y = 20,
+  y = 28,
   className,
   as = "div",
 }: {
@@ -27,7 +27,7 @@ export function Reveal({
       initial={reduce ? { opacity: 0 } : { opacity: 0, y }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-80px" }}
-      transition={{ duration: 0.6, ease, delay }}
+      transition={{ duration: 0.7, ease, delay }}
     >
       {children}
     </MotionTag>
