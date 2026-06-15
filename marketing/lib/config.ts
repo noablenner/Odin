@@ -17,6 +17,26 @@ export const links = {
   support: "/support",
 };
 
+/**
+ * Legal / company info used by the /privacy, /terms and /support pages.
+ * TODO: replace the placeholder values before submitting OAuth apps
+ * (Airtable / Google / Microsoft) for review.
+ */
+export const legal = {
+  productName: "Odin",
+  // TODO: domaine de production du site
+  domain: "https://[VOTRE-DOMAINE]",
+  // TODO: entité légale exploitant Odin
+  legalEntity: "[ENTITÉ LÉGALE — à compléter]",
+  // TODO: adresse postale de l'entité
+  address: "[ADRESSE POSTALE — à compléter]",
+  // TODO: email d'assistance RÉEL (exigé par Airtable/Google/Microsoft)
+  supportEmail: "support@[VOTRE-DOMAINE]",
+  // TODO: email dédié aux demandes RGPD (peut être identique au support)
+  privacyEmail: "privacy@[VOTRE-DOMAINE]",
+  lastUpdated: "15 juin 2026",
+};
+
 export const nav = [
   { label: "Fonctionnalités", href: "/#features" },
   { label: "Intégrations", href: "/integrations" },
