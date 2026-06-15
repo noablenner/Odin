@@ -36,9 +36,14 @@ ALL_TOOLS: dict[str, dict[str, Any]] = {
             "required": ["semantic_query"],
         },
     },
+    "list_airtable_bases": {
+        "name": "list_airtable_bases",
+        "description": "List the user's Airtable bases and the tables inside each, with their IDs and names. ALWAYS call this first to find the correct base ID and exact table name before reading or writing Airtable records.",
+        "input_schema": {"type": "object", "properties": {}},
+    },
     "get_airtable_records": {
         "name": "get_airtable_records",
-        "description": "Read records from an Airtable table.",
+        "description": "Read records from an Airtable table. If you do not already know the base ID and exact table name, call list_airtable_bases first.",
         "input_schema": {
             "type": "object",
             "properties": {
@@ -152,6 +157,7 @@ ALL_TOOLS: dict[str, dict[str, Any]] = {
 
 # Which connector type backs each tool (query_memory has none — always on).
 TOOL_CONNECTOR = {
+    "list_airtable_bases": "airtable",
     "get_airtable_records": "airtable",
     "write_airtable_record": "airtable",
     "get_qonto_transactions": "qonto",
@@ -223,6 +229,18 @@ async def _dispatch(
 
     conn_type = TOOL_CONNECTOR[name]
     creds = load_credentials(user_id, conn_type)
+
+    if name == "list_airtable_bases":
+        bases = await airtable.list_bases(creds)
+        out = [
+            {
+                "base_id": b["id"],
+                "base_name": b.get("name"),
+                "tables": [t.get("name") for t in await airtable.list_tables(creds, b["id"])],
+            }
+            for b in bases[:10]
+        ]
+        return out, {"tool": name, "count": len(out), "source": "Airtable"}
 
     if name == "get_airtable_records":
         recs = await airtable.get_records(
