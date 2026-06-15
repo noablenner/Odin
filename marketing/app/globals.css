@@ -149,6 +149,47 @@
     border: 1px solid hsl(var(--border));
   }
 
+  /* Readable long-form typography for legal pages. */
+  .prose-odin {
+    color: hsl(var(--muted-foreground));
+    line-height: 1.7;
+  }
+  .prose-odin h2 {
+    margin-top: 2.5rem;
+    margin-bottom: 0.75rem;
+    font-family: var(--font-display), system-ui, sans-serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: hsl(var(--foreground));
+    scroll-margin-top: 6rem;
+  }
+  .prose-odin h3 {
+    margin-top: 1.5rem;
+    margin-bottom: 0.4rem;
+    font-weight: 600;
+    color: hsl(var(--foreground));
+  }
+  .prose-odin p {
+    margin-bottom: 1rem;
+  }
+  .prose-odin ul {
+    margin: 0 0 1rem 0;
+    padding-left: 1.25rem;
+    list-style: disc;
+  }
+  .prose-odin li {
+    margin-bottom: 0.4rem;
+  }
+  .prose-odin a {
+    color: hsl(var(--primary));
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .prose-odin strong {
+    color: hsl(var(--foreground));
+    font-weight: 600;
+  }
+
   /* Thin subtle scrollbar */
   ::-webkit-scrollbar {
     width: 10px;
