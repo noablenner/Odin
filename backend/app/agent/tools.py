@@ -9,9 +9,11 @@ from __future__ import annotations
 import json
 from typing import Any
 
+import httpx
+
 from app.agent import rag
 from app.connectors import airtable, generic, google_drive, outlook, qonto, sheets
-from app.connectors.base import ConnectorError, load_credentials
+from app.connectors.base import ConnectorError, load_credentials, save_credentials
 from app.utils.logger import get_logger
 
 log = get_logger(__name__)
@@ -230,27 +232,37 @@ async def _dispatch(
     conn_type = TOOL_CONNECTOR[name]
     creds = load_credentials(user_id, conn_type)
 
-    if name == "list_airtable_bases":
-        bases = await airtable.list_bases(creds)
-        out = [
-            {
-                "base_id": b["id"],
-                "base_name": b.get("name"),
-                "tables": [t.get("name") for t in await airtable.list_tables(creds, b["id"])],
-            }
-            for b in bases[:10]
-        ]
-        return out, {"tool": name, "count": len(out), "source": "Airtable"}
+    if conn_type == "airtable":
+        async def _run(c: dict[str, Any]):
+            if name == "list_airtable_bases":
+                bases = await airtable.list_bases(c)
+                out = [
+                    {
+                        "base_id": b["id"],
+                        "base_name": b.get("name"),
+                        "tables": [t.get("name") for t in await airtable.list_tables(c, b["id"])],
+                    }
+                    for b in bases[:10]
+                ]
+                return out, {"tool": name, "count": len(out), "source": "Airtable"}
+            if name == "get_airtable_records":
+                recs = await airtable.get_records(c, ti["base"], ti["table"], ti.get("filter"))
+                return recs, {"tool": name, "count": len(recs), "source": "Airtable"}
+            rec = await airtable.create_record(c, ti["base"], ti["table"], ti["fields"])
+            return rec, {"tool": name, "source": "Airtable", "wrote": True}
 
-    if name == "get_airtable_records":
-        recs = await airtable.get_records(
-            creds, ti["base"], ti["table"], ti.get("filter")
-        )
-        return recs, {"tool": name, "count": len(recs), "source": "Airtable"}
-
-    if name == "write_airtable_record":
-        rec = await airtable.create_record(creds, ti["base"], ti["table"], ti["fields"])
-        return rec, {"tool": name, "source": "Airtable", "wrote": True}
+        try:
+            return await _run(creds)
+        except httpx.HTTPStatusError as exc:
+            if exc.response.status_code in (401, 403) and creds.get("refresh_token"):
+                creds = await airtable.refresh_access_token(creds)
+                save_credentials(
+                    user_id,
+                    "airtable",
+                    {k: v for k, v in creds.items() if k != "__config__"},
+                )
+                return await _run(creds)
+            raise
 
     if name == "get_qonto_transactions":
         txs = await qonto.get_transactions(creds, ti.get("date_from"), ti.get("date_to"))
