@@ -50,7 +50,20 @@ _COMPLEX_KEYWORDS = (
 )
 
 
-def _auto_select_model(message: str, match_count: int = 0) -> str:
+# Words that signal the request will touch a connected tool / live data, where
+# reliable multi-step tool use matters; escalate those to the stronger model.
+_TOOL_KEYWORDS = (
+    "airtable", "base", "table", "tableau", "enregistrement", "record",
+    "prospect", "client", "contact", "lead", "deal", "crm", "email", "mail",
+    "qonto", "transaction", "solde", "facture", "invoice", "compte",
+    "drive", "fichier", "document", "sheet", "spreadsheet", "feuille",
+    "outlook", "calendrier", "calendar", "agenda", "rendez", "connecteur",
+)
+
+
+def _auto_select_model(
+    message: str, match_count: int = 0, has_connectors: bool = False
+) -> str:
     """Heuristic, per-message model selection - no extra API call, no latency.
 
     Returns AUTO_COMPLEX_MODEL for requests that look demanding, otherwise the
@@ -71,12 +84,18 @@ def _auto_select_model(message: str, match_count: int = 0) -> str:
         return AUTO_COMPLEX_MODEL
     if any(kw in lowered for kw in _COMPLEX_KEYWORDS):
         return AUTO_COMPLEX_MODEL
+    # When tools are connected, route data-ish requests to the stronger model so
+    # multi-step tool calls (discover base -> read records) stay reliable.
+    if has_connectors and any(kw in lowered for kw in _TOOL_KEYWORDS):
+        return AUTO_COMPLEX_MODEL
     return AUTO_SIMPLE_MODEL
 
 
-def _resolve_model(message: str, match_count: int = 0) -> str:
+def _resolve_model(
+    message: str, match_count: int = 0, has_connectors: bool = False
+) -> str:
     """Always auto-route. The manual model picker has been removed from the UI."""
-    return _auto_select_model(message, match_count)
+    return _auto_select_model(message, match_count, has_connectors)
 
 
 def _provider_for(model: str) -> str:
@@ -118,7 +137,8 @@ async def run_agent(
     rag_context = rag.format_context(matches)
 
     # Automatic per-message model selection (depends on RAG match count).
-    model = _resolve_model(message, len(matches))
+    has_connectors = any(c.get("status") == "connected" for c in connectors)
+    model = _resolve_model(message, len(matches), has_connectors)
     provider = _provider_for(model)
     system_prompt = build_system_prompt(profile, connectors, rag_context, user.timezone)
 
