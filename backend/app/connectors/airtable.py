@@ -48,6 +48,26 @@ async def exchange_code(code: str, code_verifier: str) -> dict[str, Any]:
         return resp.json()
 
 
+async def refresh_access_token(creds: dict[str, Any]) -> dict[str, Any]:
+    """Exchange the stored refresh_token for a fresh access_token."""
+    rt = creds.get("refresh_token")
+    if not rt:
+        raise ConnectorError("Airtable session expired - please reconnect Airtable.")
+    async with httpx.AsyncClient(timeout=30) as client:
+        resp = await client.post(
+            OAUTH_TOKEN,
+            data={
+                "grant_type": "refresh_token",
+                "refresh_token": rt,
+                "client_id": settings.airtable_client_id,
+            },
+            auth=(settings.airtable_client_id, settings.airtable_client_secret),
+            headers={"Content-Type": "application/x-www-form-urlencoded"},
+        )
+        resp.raise_for_status()
+        return {**creds, **resp.json()}
+
+
 def _token(creds: dict[str, Any]) -> str:
     token = creds.get("access_token") or creds.get("api_key")
     if not token:
