@@ -8,6 +8,9 @@ import httpx
 
 from app.config import settings
 from app.connectors.base import ConnectorError
+from app.utils.logger import get_logger
+
+log = get_logger(__name__)
 
 API_BASE = "https://api.airtable.com/v0"
 META_BASE = "https://api.airtable.com/v0/meta"
@@ -60,6 +63,7 @@ async def refresh_access_token(creds: dict[str, Any]) -> dict[str, Any]:
                 "grant_type": "refresh_token",
                 "refresh_token": rt,
                 "client_id": settings.airtable_client_id,
+                "scope": "data.records:read data.records:write schema.bases:read",
             },
             auth=(settings.airtable_client_id, settings.airtable_client_secret),
             headers={"Content-Type": "application/x-www-form-urlencoded"},
@@ -80,6 +84,8 @@ async def _get(creds: dict[str, Any], url: str, params: dict | None = None) -> d
         resp = await client.get(
             url, headers={"Authorization": f"Bearer {_token(creds)}"}, params=params
         )
+        if resp.status_code >= 400:
+            log.warning("Airtable GET %s -> %s: %s", url, resp.status_code, resp.text[:400])
         resp.raise_for_status()
         return resp.json()
 
