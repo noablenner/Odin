@@ -45,7 +45,7 @@ ALL_TOOLS: dict[str, dict[str, Any]] = {
     },
     "get_airtable_records": {
         "name": "get_airtable_records",
-        "description": "Read records from an Airtable table. If you do not already know the base ID and exact table name, call list_airtable_bases first.",
+        "description": "Read records from an Airtable table. If you do not already know the base ID and exact table name, call list_airtable_bases first. To find a specific record, prefer reading the table WITHOUT a filter and locating the match yourself; only pass filter using exact field names from list_airtable_bases.",
         "input_schema": {
             "type": "object",
             "properties": {
@@ -236,14 +236,24 @@ async def _dispatch(
         async def _run(c: dict[str, Any]):
             if name == "list_airtable_bases":
                 bases = await airtable.list_bases(c)
-                out = [
-                    {
-                        "base_id": b["id"],
-                        "base_name": b.get("name"),
-                        "tables": [t.get("name") for t in await airtable.list_tables(c, b["id"])],
-                    }
-                    for b in bases[:10]
-                ]
+                out = []
+                for b in bases[:10]:
+                    tables = await airtable.list_tables(c, b["id"])
+                    out.append(
+                        {
+                            "base_id": b["id"],
+                            "base_name": b.get("name"),
+                            "tables": [
+                                {
+                                    "name": t.get("name"),
+                                    "fields": [
+                                        f.get("name") for f in (t.get("fields") or [])
+                                    ],
+                                }
+                                for t in tables
+                            ],
+                        }
+                    )
                 return out, {"tool": name, "count": len(out), "source": "Airtable"}
             if name == "get_airtable_records":
                 recs = await airtable.get_records(c, ti["base"], ti["table"], ti.get("filter"))
